@@ -138,12 +138,12 @@ pub enum Modal {
     /// but pop-up windows are not.
     #[default]
     Application = MB_APPLMODAL,
-    /// Same as (`Application`)[Self::Application] except that the message box has the `WS_EX_TOPMOST` style.
+    /// Same as [`Application`](Self::Application) except that the message box has the `WS_EX_TOPMOST` style.
     /// Use system-modal message boxes to notify the user of serious,
     /// potentially damaging errors that require immediate attention (for example, running out of memory).
     /// This flag has no effect on the user's ability to interact with windows other than those associated with [`hwnd`](MessageBox::hwnd).
     System = MB_SYSTEMMODAL,
-    /// Same as (`Application`)[Self::Application] except that all the top-level windows belonging to the current thread are disabled
+    /// Same as [`Application`](Self::Application) except that all the top-level windows belonging to the current thread are disabled
     /// if the [`hwnd`](MessageBox::hwnd) parameter is `0`. Use this flag when the calling application
     /// or library does not have a window handle available but still needs to prevent input to other windows in the calling thread
     /// without suspending other threads.
