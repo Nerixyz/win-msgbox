@@ -10,4 +10,4 @@ categories = ["gui", "os"]
 authors = ["Nerixyz"]
 
 [dependencies]
-windows-sys = { version = "0.45", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
+windows-sys = { version = "0.48", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
