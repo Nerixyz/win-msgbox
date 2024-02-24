@@ -335,7 +335,7 @@ impl<T: Options> MessageBox<T> {
                 self.hwnd,
                 self.text,
                 self.title,
-                T::flags() | self.icon.style(),
+                T::flags() | self.icon.style() | self.flags,
             )
         };
         match return_code {
