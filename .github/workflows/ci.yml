@@ -1,10 +1,10 @@
-name: Rust
+name: Ci
 
 on:
   push:
-    branches: ["master"]
+    branches: [master, main]
   pull_request:
-    branches: ["master"]
+    branches: [master, main]
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,10 +13,15 @@ jobs:
   build:
     name: Build and Lint
     runs-on: windows-latest
+    strategy:
+      matrix:
+        toolchain: [stable, nightly]
     steps:
-      - uses: actions/checkout@v3
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.toolchain}}
+          components: clippy
       - name: Build
         run: cargo build
       - name: Run clippy
@@ -28,13 +33,11 @@ jobs:
     name: Check Formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
-          override: true
           toolchain: nightly
-      - run: rustup component add rustfmt
+          components: rustfmt
       - name: rustfmt
         run: cargo fmt --check
       - uses: actionsx/prettier@v3
