@@ -4,25 +4,23 @@
 //!
 //! All configuration is done through [MessageBox] and available buttons are configured via [Options].
 //!
-//! This crate uses wide strings. To create a wide string use the `w!` macro from [`windows`](https://docs.rs/windows/latest/windows/macro.w.html) or [`windows_sys`](https://docs.rs/windows-sys/latest/windows_sys/macro.w.html).
+//! This crate uses wide strings. To create a wide string use the `w!` macro re-exported by this crate from [`windows_sys`](https://docs.rs/windows-sys/latest/windows_sys/macro.w.html).
 //!
 //! ## Examples
 //!
 //! Show a minimal message box with an **OK** button:
 //!
 //! ```no_run
-//! # use windows_sys::w;
-//! # use win_msgbox::Okay;
+//! use win_msgbox::{w, Okay};
 //! win_msgbox::show::<Okay>(w!("Hello World"));
 //! ```
 //!
 //! Show a message box with an error icon, and match on the return value:
 //!
 //! ```no_run
-//! # use windows_sys::{w, Win32::Foundation::WIN32_ERROR};
-//! # use win_msgbox::CancelTryAgainContinue;
-//! # fn main() -> Result<(), WIN32_ERROR> {
-//! use CancelTryAgainContinue::*;
+//! use win_msgbox::{w, CancelTryAgainContinue::{self, *}};
+//!
+//! # fn main() -> win_msgbox::Result<()> {
 //! let response = win_msgbox::error::<CancelTryAgainContinue>(w!("Couldn't download resource"))
 //!     .title(w!("Download Error"))
 //!     .show()?;
@@ -32,7 +30,8 @@
 //!     TryAgain => println!("Attempting redownload..."),
 //!     Continue => println!("Skipping resource"),
 //! }
-//! # Ok(()) }
+//! #    Ok(())
+//! # }
 //! ```
 #![deny(missing_docs)]
 #![deny(clippy::cargo)]
@@ -40,7 +39,7 @@ use std::marker::PhantomData;
 use windows_sys::{
     core::PCWSTR,
     Win32::{
-        Foundation::{GetLastError, HWND, WIN32_ERROR},
+        Foundation::{GetLastError, HWND},
         UI::WindowsAndMessaging::{
             MessageBoxW, MB_APPLMODAL, MB_DEFAULT_DESKTOP_ONLY, MB_DEFBUTTON1, MB_DEFBUTTON2,
             MB_DEFBUTTON3, MB_DEFBUTTON4, MB_HELP, MB_ICONASTERISK, MB_ICONERROR,
@@ -66,6 +65,14 @@ pub use okay_cancel::*;
 pub use retry_cancel::*;
 pub use yes_no::*;
 pub use yes_no_cancel::*;
+
+pub use windows_sys::w;
+
+/// Raw error returned by [GetLastError](https://learn.microsoft.com/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror).
+pub type Error = windows_sys::Win32::Foundation::WIN32_ERROR;
+
+/// Convenience wrapper type for a `Result<T, win_msgbox::Error>`.
+pub type Result<T> = core::result::Result<T, Error>;
 
 /// This trait is implemented for all possible options.
 ///
@@ -329,7 +336,7 @@ impl<T: Options> MessageBox<T> {
     /// unless an **Ok** button is present.
     ///
     /// If an **Ok** button is displayed and the user presses ESC, the return value will be `Ok`.
-    pub fn show(self) -> Result<T, WIN32_ERROR> {
+    pub fn show(self) -> Result<T> {
         let return_code = unsafe {
             MessageBoxW(
                 self.hwnd,
@@ -359,6 +366,6 @@ ctors! {
 /// Shows a message box with a specified `text` to be displayed.
 ///
 /// For more options see [MessageBox].
-pub fn show<T: Options>(text: impl Into<PCWSTR>) -> Result<T, WIN32_ERROR> {
+pub fn show<T: Options>(text: impl Into<PCWSTR>) -> Result<T> {
     MessageBox::new(text).show()
 }
