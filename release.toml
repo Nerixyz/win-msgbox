@@ -6,5 +6,5 @@ pre-release-replacements = [
     { file = "CHANGELOG.md", search = "\\.\\.\\.HEAD", replace = "...{{tag_name}}", exactly = 1 },
     { file = "CHANGELOG.md", search = "ReleaseDate", replace = "{{date}}" },
     { file = "CHANGELOG.md", search = "<!-- next-header -->", replace = "<!-- next-header -->\n\n## [Unreleased] - ReleaseDate", exactly = 1 },
-    { file = "CHANGELOG.md", search = "(?-m)<!-- next-url -->\n", replace = "<!-- next-url -->\n\n[Unreleased]: https://github.com/Nerixyz/win-msgbox/compare/{{tag_name}}...HEAD", exactly = 1 },
+    { file = "CHANGELOG.md", search = "(?-m)<!-- next-url -->\\s", replace = "<!-- next-url -->\n\n[Unreleased]: https://github.com/Nerixyz/win-msgbox/compare/{{tag_name}}...HEAD", exactly = 1 },
 ]
