@@ -1,0 +1,42 @@
+name: Rust
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build and Lint
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build
+      - name: Run clippy
+        run: cargo clippy --tests
+      - name: Run tests
+        run: cargo test
+
+  check-format:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          override: true
+          toolchain: nightly
+      - run: rustup component add rustfmt
+      - name: rustfmt
+        run: cargo fmt --check
+      - uses: actionsx/prettier@v3
+        with:
+          args: --check .
