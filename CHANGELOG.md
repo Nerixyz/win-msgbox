@@ -16,6 +16,10 @@ See https://github.com/crate-ci/cargo-release
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added re-exports for `w!`, `Error`, and `Result` (#5).
+
 ### Changed
 
 - Updated to `windows-sys` 0.52 (#3)
