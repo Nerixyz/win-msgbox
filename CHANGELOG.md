@@ -16,6 +16,8 @@ See https://github.com/crate-ci/cargo-release
 
 ## [Unreleased] - ReleaseDate
 
+## [0.1.3] - 2024-02-25
+
 ### Added
 
 - Added re-exports for `w!`, `Error`, and `Result` (#5).
@@ -46,7 +48,9 @@ Initial release.
 
 <!-- next-url -->
 
-[Unreleased]: https://github.com/Nerixyz/win-msgbox/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/Nerixyz/win-msgbox/compare/v0.1.3...HEAD
+
+[0.1.3]: https://github.com/Nerixyz/win-msgbox/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Nerixyz/win-msgbox/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Nerixyz/win-msgbox/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Nerixyz/win-msgbox/commit/5ad4e0f16d20ab39858de5cd9271b9a8be5b7869
