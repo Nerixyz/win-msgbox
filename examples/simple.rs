@@ -1,8 +1,8 @@
-use win_msgbox::{w, Okay, Result};
+use win_msgbox::{Okay, Result};
 
 fn main() -> Result<()> {
-    win_msgbox::information::<Okay>(w!("Ferris landed on Mars."))
-        .title(w!("Landing Module"))
+    win_msgbox::information::<Okay>("Ferris landed on Mars.")
+        .title("Landing Module")
         .show()?;
     Ok(())
 }

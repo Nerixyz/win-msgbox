@@ -1,5 +1,7 @@
 # Changelog
 
+<!-- markdownlint-configure-file { "no-duplicate-heading": { "siblings_only": true } } -->
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -15,6 +17,13 @@ See https://github.com/crate-ci/cargo-release
 <!-- next-header -->
 
 ## [Unreleased] - ReleaseDate
+
+### Changed
+
+- BREAKING: Detached unsafe, raw bindings and safe interface.
+  Migrating to the new version involves changing arguments to `title` and `message` from `PCWSTR` to `&str`,
+  which, in case of constants, requires removing `w!`. The raw interface has moved to the `raw` module.
+  Take a look at the docs for more info.
 
 ## [0.1.3] - 2024-02-25
 

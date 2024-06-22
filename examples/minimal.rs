@@ -1,5 +1,5 @@
-use win_msgbox::{w, Okay};
+use win_msgbox::Okay;
 
 fn main() {
-    assert_eq!(win_msgbox::show::<Okay>(w!("Hello World")), Ok(Okay));
+    assert_eq!(win_msgbox::show::<Okay>("Hello World"), Ok(Okay));
 }
