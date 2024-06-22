@@ -1,11 +1,11 @@
-use win_msgbox::{w, Okay, Result};
+use win_msgbox::{Okay, Result};
 
 fn main() -> Result<()> {
-    win_msgbox::information::<Okay>(w!(
-        "This is some longer paragraph to demonstrate how\nthe text is right justified."
-    ))
+    win_msgbox::information::<Okay>(
+        "This is some longer paragraph to demonstrate how\nthe text is right justified.",
+    )
     .right()
-    .title(w!("Cool Demo App"))
+    .title("Cool Demo App")
     .show()?;
     Ok(())
 }

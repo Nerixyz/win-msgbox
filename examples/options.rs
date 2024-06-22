@@ -1,12 +1,11 @@
 use win_msgbox::{
-    w,
     CancelTryAgainContinue::{self, *},
     Result,
 };
 
 fn main() -> Result<()> {
-    let response = win_msgbox::error::<CancelTryAgainContinue>(w!("Couldn't download resource"))
-        .title(w!("Download Error"))
+    let response = win_msgbox::error::<CancelTryAgainContinue>("Couldn't download resource")
+        .title("Download Error")
         .show()?;
 
     match response {

@@ -6,7 +6,9 @@ All possible options are usable and return values are Rust enums (or structs if 
 
 All configuration is done through `MessageBox` and available buttons are configured via `Options`.
 
-This crate uses wide strings. To create a wide string use the `w!` macro from [`windows`](https://docs.rs/windows/latest/windows/macro.w.html) or [`windows_sys`](https://docs.rs/windows-sys/latest/windows_sys/macro.w.html).
+`message` and `title` will be converted to UTF-16 when calling `show` on the fly,
+if this isn't desired, use the structs and functions exported in the `raw` module. However, note that these are
+`unsafe`, as they assume the passed pointers point to valid, null-terminated UTF-16 strings.
 
 ## Examples
 

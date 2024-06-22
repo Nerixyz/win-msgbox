@@ -4,25 +4,27 @@
 //!
 //! All configuration is done through [MessageBox] and available buttons are configured via [Options].
 //!
-//! This crate uses wide strings. To create a wide string use the `w!` macro re-exported by this crate from [`windows_sys`](https://docs.rs/windows-sys/latest/windows_sys/macro.w.html).
+//! `message` and `title` will be converted to UTF-16 when calling [show][MessageBox::show] on the fly.
+//! If this isn't desired, use the structs and functions exported in the [raw] module. However, note that these are
+//! `unsafe`, as they assume the passed pointers point to valid, null-terminated UTF-16 strings.
 //!
 //! ## Examples
 //!
 //! Show a minimal message box with an **OK** button:
 //!
 //! ```no_run
-//! use win_msgbox::{w, Okay};
-//! win_msgbox::show::<Okay>(w!("Hello World"));
+//! use win_msgbox::Okay;
+//! win_msgbox::show::<Okay>("Hello World");
 //! ```
 //!
 //! Show a message box with an error icon, and match on the return value:
 //!
 //! ```no_run
-//! use win_msgbox::{w, CancelTryAgainContinue::{self, *}};
+//! use win_msgbox::CancelTryAgainContinue::{self, *};
 //!
 //! # fn main() -> win_msgbox::Result<()> {
-//! let response = win_msgbox::error::<CancelTryAgainContinue>(w!("Couldn't download resource"))
-//!     .title(w!("Download Error"))
+//! let response = win_msgbox::error::<CancelTryAgainContinue>("Couldn't download resource")
+//!     .title("Download Error")
 //!     .show()?;
 //!
 //! match response {
@@ -36,17 +38,14 @@
 #![deny(missing_docs)]
 #![deny(clippy::cargo)]
 use std::marker::PhantomData;
-use windows_sys::{
-    core::PCWSTR,
-    Win32::{
-        Foundation::{GetLastError, HWND},
-        UI::WindowsAndMessaging::{
-            MessageBoxW, MB_APPLMODAL, MB_DEFAULT_DESKTOP_ONLY, MB_DEFBUTTON1, MB_DEFBUTTON2,
-            MB_DEFBUTTON3, MB_DEFBUTTON4, MB_HELP, MB_ICONASTERISK, MB_ICONERROR,
-            MB_ICONEXCLAMATION, MB_ICONHAND, MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONSTOP,
-            MB_ICONWARNING, MB_RIGHT, MB_RTLREADING, MB_SERVICE_NOTIFICATION, MB_SETFOREGROUND,
-            MB_SYSTEMMODAL, MB_TASKMODAL, MB_TOPMOST, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
-        },
+use windows_sys::Win32::{
+    Foundation::{GetLastError, HWND},
+    UI::WindowsAndMessaging::{
+        MessageBoxW, MB_APPLMODAL, MB_DEFAULT_DESKTOP_ONLY, MB_DEFBUTTON1, MB_DEFBUTTON2,
+        MB_DEFBUTTON3, MB_DEFBUTTON4, MB_HELP, MB_ICONASTERISK, MB_ICONERROR, MB_ICONEXCLAMATION,
+        MB_ICONHAND, MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONSTOP, MB_ICONWARNING, MB_RIGHT,
+        MB_RTLREADING, MB_SERVICE_NOTIFICATION, MB_SETFOREGROUND, MB_SYSTEMMODAL, MB_TASKMODAL,
+        MB_TOPMOST, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
     },
 };
 
@@ -54,6 +53,7 @@ mod abort_retry_ignore;
 mod cancel_try_again_continue;
 mod okay;
 mod okay_cancel;
+pub mod raw;
 mod retry_cancel;
 mod yes_no;
 mod yes_no_cancel;
@@ -65,8 +65,6 @@ pub use okay_cancel::*;
 pub use retry_cancel::*;
 pub use yes_no::*;
 pub use yes_no_cancel::*;
-
-pub use windows_sys::w;
 
 /// Raw error returned by [GetLastError](https://learn.microsoft.com/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror).
 pub type Error = windows_sys::Win32::Foundation::WIN32_ERROR;
@@ -178,13 +176,13 @@ pub enum DefaultButton {
 /// a set of buttons, and a brief application-specific message, such as status or error information.
 ///
 /// The type of the message box is specified by `T` (See [Options] for available options).
-pub struct MessageBox<T> {
+pub struct MessageBox<'a, T> {
     /// The icon of this message box.
     icon: Icon,
     /// The text inside the message box.
-    text: PCWSTR,
-    /// The title of the message box (default is null).
-    title: PCWSTR,
+    text: &'a str,
+    /// The title of the message box (default is None).
+    title: Option<&'a str>,
     /// The owner window of the message box (default is `0` - no owner)
     hwnd: HWND,
     /// Flags for the creation of this message box.
@@ -193,9 +191,11 @@ pub struct MessageBox<T> {
     _response: PhantomData<T>,
 }
 
-impl<T> std::fmt::Debug for MessageBox<T> {
+impl<T> std::fmt::Debug for MessageBox<'_, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MessageBox")
+            .field("title", &self.title)
+            .field("text", &self.text)
             .field("icon", &self.icon)
             .field("hwnd", &self.hwnd)
             .finish()
@@ -204,31 +204,31 @@ impl<T> std::fmt::Debug for MessageBox<T> {
 
 macro_rules! ctors {
     ($($name:ident => $icon:ident),*) => {
-        impl <T> MessageBox<T> {
+        impl <'a, T> MessageBox<'a, T> {
             $(
             #[doc = concat!("Creates a new message box where its icon is set to [", stringify!($icon), "](Icon::", stringify!($icon),").")]
-            pub fn $name(text: impl Into<PCWSTR>) -> Self {
+            pub fn $name(text: &'a str) -> Self {
                 Self::new(text).icon(Icon::$icon)
             }
             )*
         }
         $(
         #[doc = concat!("Creates a new message box where its icon is set to [", stringify!($icon), "](Icon::", stringify!($icon),").")]
-        pub fn $name<T>(text: impl Into<PCWSTR>) -> MessageBox<T> {
+        pub fn $name<T>(text: &str) -> MessageBox<'_, T> {
             MessageBox::<T>::$name(text)
         })*
     };
 }
 
-impl<T> MessageBox<T> {
+impl<'a, T> MessageBox<'a, T> {
     /// Creates a new message box with a specified `text` to be displayed.
     /// If the string consists of more than one line,
     /// you can separate the lines using a carriage return and/or linefeed character between each line.
-    pub fn new(text: impl Into<PCWSTR>) -> Self {
+    pub fn new(text: &'a str) -> Self {
         Self {
             icon: Icon::Information,
-            text: text.into(),
-            title: std::ptr::null(),
+            text,
+            title: None,
             hwnd: 0,
             flags: 0,
             _response: PhantomData,
@@ -242,7 +242,7 @@ impl<T> MessageBox<T> {
     }
 
     /// The dialog box title. If this parameter is **null**, the default title is **Error**.
-    pub fn title(mut self, title: impl Into<PCWSTR>) -> Self {
+    pub fn title(mut self, title: &'a str) -> Self {
         self.title = title.into();
         self
     }
@@ -326,7 +326,7 @@ impl<T> MessageBox<T> {
     }
 }
 
-impl<T: Options> MessageBox<T> {
+impl<T: Options> MessageBox<'_, T> {
     /// Shows the message box, returning the option the user clicked on.
     ///
     /// If a message box has a **Cancel** button, the function returns the `Cancel` value
@@ -337,11 +337,21 @@ impl<T: Options> MessageBox<T> {
     ///
     /// If an **Ok** button is displayed and the user presses ESC, the return value will be `Ok`.
     pub fn show(self) -> Result<T> {
+        let text: Vec<_> = self.text.encode_utf16().chain(std::iter::once(0)).collect();
+        let title = match self.title {
+            Some(t) => t.encode_utf16().chain(std::iter::once(0)).collect(),
+            None => Vec::new(),
+        };
+
         let return_code = unsafe {
             MessageBoxW(
                 self.hwnd,
-                self.text,
-                self.title,
+                text.as_ptr(),
+                if title.is_empty() {
+                    std::ptr::null()
+                } else {
+                    title.as_ptr()
+                },
                 T::flags() | self.icon.style() | self.flags,
             )
         };
@@ -366,6 +376,6 @@ ctors! {
 /// Shows a message box with a specified `text` to be displayed.
 ///
 /// For more options see [MessageBox].
-pub fn show<T: Options>(text: impl Into<PCWSTR>) -> Result<T> {
+pub fn show<T: Options>(text: &str) -> Result<T> {
     MessageBox::new(text).show()
 }
