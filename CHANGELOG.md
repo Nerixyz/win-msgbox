@@ -20,10 +20,10 @@ See https://github.com/crate-ci/cargo-release
 
 ### Changed
 
-- BREAKING: Detached unsafe, raw bindings and safe interface.
+- BREAKING: Detached unsafe, raw bindings and safe interface (#8).
   Migrating to the new version involves changing arguments to `title` and `message` from `PCWSTR` to `&str`,
   which, in case of constants, requires removing `w!`. The raw interface has moved to the `raw` module.
-  Take a look at the docs for more info.
+  Take a look at the [docs](https://docs.rs/win-msgbox) and [examples](https://github.com/Nerixyz/win-msgbox/tree/master/examples) for more info.
 
 ## [0.1.3] - 2024-02-25
 
