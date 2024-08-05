@@ -114,7 +114,7 @@ impl<T> MessageBox<T> {
             icon: Icon::Information,
             text: text.into(),
             title: std::ptr::null(),
-            hwnd: 0,
+            hwnd: std::ptr::null_mut(),
             flags: 0,
             _response: PhantomData,
         }
