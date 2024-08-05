@@ -229,7 +229,7 @@ impl<'a, T> MessageBox<'a, T> {
             icon: Icon::Information,
             text,
             title: None,
-            hwnd: 0,
+            hwnd: std::ptr::null_mut(),
             flags: 0,
             _response: PhantomData,
         }
