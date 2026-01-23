@@ -18,6 +18,10 @@ See https://github.com/crate-ci/cargo-release
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- `MessageBox` and `raw::MessageBox` are now marked with `#[must_use]` to provide better diagnostics. (#15)
+
 ## [0.2.2] - 2026-01-23
 
 - Updated to `windows-sys` 0.61 (#13)

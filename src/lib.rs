@@ -176,6 +176,7 @@ pub enum DefaultButton {
 /// a set of buttons, and a brief application-specific message, such as status or error information.
 ///
 /// The type of the message box is specified by `T` (See [Options] for available options).
+#[must_use = "A MessageBox on its own does not show anything, call MessageBox::show() on it."]
 pub struct MessageBox<'a, T> {
     /// The icon of this message box.
     icon: Icon,
