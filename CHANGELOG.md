@@ -18,6 +18,8 @@ See https://github.com/crate-ci/cargo-release
 
 ## [Unreleased] - ReleaseDate
 
+- Updated to `windows-sys` 0.61 (#13)
+
 ## [0.2.1] - 2024-08-05
 
 - Updated to `windows-sys` 0.59 (#10)
