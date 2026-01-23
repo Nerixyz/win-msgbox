@@ -21,6 +21,7 @@ See https://github.com/crate-ci/cargo-release
 ### Changed
 
 - `MessageBox` and `raw::MessageBox` are now marked with `#[must_use]` to provide better diagnostics. (#15)
+- Updated examples in `README.md` and added example for a panic hook. (#16)
 
 ## [0.2.2] - 2026-01-23
 
