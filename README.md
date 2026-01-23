@@ -15,7 +15,8 @@ if this isn't desired, use the structs and functions exported in the `raw` modul
 Show a minimal message box with an **OK** button:
 
 ```rust
-win_msgbox::show::<Okay>(w!("Hello World"));
+use win_msgbox::Okay;
+win_msgbox::show::<Okay>("Hello World");
 ```
 
 ![Image of the resulting message box](res/minimal.png)
@@ -23,10 +24,10 @@ win_msgbox::show::<Okay>(w!("Hello World"));
 Show a message box with an error icon, and match on the return value:
 
 ```rust
-use win_msgbox::{w, CancelTryAgainContinue::{self, *}};
+use win_msgbox::CancelTryAgainContinue::{self, *};
 
-let response = win_msgbox::error::<CancelTryAgainContinue>(w!("Couldn't download resource"))
-    .title(w!("Download Error"))
+let response = win_msgbox::error::<CancelTryAgainContinue>("Couldn't download resource")
+    .title("Download Error")
     .show()?;
 
 match response {
@@ -37,5 +38,25 @@ match response {
 ```
 
 ![Image of the resulting message box](res/options.png)
+
+```rust
+use std::fmt::Write;
+
+std::panic::set_hook(Box::new(|info| {
+    let mut buf = String::from("Panic occurred: ");
+
+    if let Some(msg) = info.payload_as_str() {
+        buf.push_str(msg);
+    } else {
+        buf.push_str("(no message)");
+    }
+    if let Some(loc) = info.location() {
+        let _ = write!(&mut buf, " at {loc}");
+    }
+    let _ = win_msgbox::error::<win_msgbox::Okay>(&buf).show();
+}));
+```
+
+![Image of the resulting message box](res/panic_hook.png)
 
 For more examples, take a look at the [`examples`](examples) directory.

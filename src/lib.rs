@@ -35,6 +35,27 @@
 //! #    Ok(())
 //! # }
 //! ```
+//!
+//! Show a message box when a thread panics (note that this assumes the program did not run out of memory):
+//!
+//! ```no_run
+//! use std::fmt::Write;
+//!
+//! std::panic::set_hook(Box::new(|info| {
+//!     let mut buf = String::from("Panic occurred: ");
+//!
+//!     if let Some(msg) = info.payload_as_str() {
+//!         buf.push_str(msg);
+//!     } else {
+//!         buf.push_str("(no message)");
+//!     }
+//!     if let Some(loc) = info.location() {
+//!         let _ = write!(&mut buf, " at {loc}");
+//!     }
+//!     let _ = win_msgbox::error::<win_msgbox::Okay>(&buf).show();
+//! }));
+//! ```
+//!
 #![deny(missing_docs)]
 #![deny(clippy::cargo)]
 use std::marker::PhantomData;
